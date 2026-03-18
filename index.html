@@ -1,138 +1,129 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lite Code Runner</title>
-    <link rel="stylesheet" href="./assets/styles.css" />
-  </head>
-  <body>
-    <main class="app-shell">
-      <header class="hero">
-        <h1>Lite Code Runner</h1>
-        <p>在浏览器中运行 Python / C / C++ / Java / JavaScript / Matlab</p>
-      </header>
 
-      <section class="card security-alert" role="alert">
-        ⚠️ 由于程序执行使用的是第三方 API，不要提交涉密、隐私的数据或文件。
-      </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lite Code Runner</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
 
-      <section class="controls card">
-        <div class="control-item">
-          <label for="languageSelect">编程语言</label>
-          <select id="languageSelect" aria-label="选择编程语言"></select>
-        </div>
-        <div class="control-item">
-          <label for="versionSelect">版本</label>
-          <select id="versionSelect" aria-label="选择编程语言版本"></select>
-        </div>
-        <div class="control-item actions">
-          <button id="runButton" class="btn btn-primary" type="button">运行代码</button>
-          <button id="debugButton" class="btn btn-ghost" type="button">Debug（预留）</button>
-        </div>
-      </section>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <h1>Lite Code Runner</h1>
+      <p>在浏览器中运行 Python / C / C++ / Java / JavaScript / Matlab</p>
+    </header>
 
-      <section class="editor-grid">
-        <article class="card panel">
-          <div class="panel-title panel-title-row">
-            <span>程序代码输入</span>
-            <div>
-              <button id="uploadCodeButton" class="btn btn-ghost btn-sm" type="button">上传源代码</button>
-              <input
-                id="sourceCodeFileInput"
-                class="hidden-file-input"
-                type="file"
-                accept=".py,.c,.cc,.cpp,.cxx,.java,.txt"
-              />
-            </div>
-          </div>
-          <div class="editor-with-lines">
-            <pre id="codeLines" class="line-numbers" aria-hidden="true">1</pre>
-            <textarea id="codeInput" spellcheck="false" wrap="off"></textarea>
-          </div>
-        </article>
+    <section class="card security-alert" role="alert">
+      ⚠️ 由于程序执行使用的是第三方 API，不要提交涉密、隐私的数据或文件。
+    </section>
 
-        <article class="card panel side-stack">
-          <div class="execution-args-group">
-            <label for="executionArgsInput">执行参数（可选）</label>
-            <input
-              id="executionArgsInput"
-              type="text"
-              placeholder="例如：--input data.txt --mode fast"
-            />
-          </div>
+    <section class="controls card">
+      <div class="control-item">
+        <label for="languageSelect">编程语言</label>
+        <select id="languageSelect" aria-label="选择编程语言"></select>
+      </div>
+      <div class="control-item">
+        <label for="versionSelect">版本</label>
+        <select id="versionSelect" aria-label="选择编程语言版本"></select>
+      </div>
+      <div class="control-item actions">
+        <button id="runButton" class="btn btn-primary" type="button">运行代码</button>
+        <button id="debugButton" class="btn btn-ghost" type="button">Debug（预留）</button>
+      </div>
+    </section>
 
+    <section class="editor-grid">
+      <article class="card panel">
+        <div class="panel-title panel-title-row">
+          <span>程序代码输入</span>
           <div>
-            <div class="panel-title panel-title-row">
-              <span>程序标准输入（stdin）</span>
-              <div>
-                <button id="uploadStdinButton" class="btn btn-ghost btn-sm" type="button">上传输入</button>
-                <input
-                  id="stdinFileInput"
-                  class="hidden-file-input"
-                  type="file"
-                  accept=".txt,.in,.csv,.json,.xml,.yaml,.yml,.log,.md"
-                />
-              </div>
-            </div>
-            <div class="editor-with-lines stdin-editor-with-lines">
-              <pre id="stdinLines" class="line-numbers" aria-hidden="true">1</pre>
-              <textarea id="stdinInput" spellcheck="false" wrap="off" placeholder="可选：在此输入程序运行时需要的标准输入"></textarea>
+            <button id="uploadCodeButton" class="btn btn-ghost btn-sm" type="button">上传源代码</button>
+            <input id="sourceCodeFileInput" class="hidden-file-input" type="file"
+              accept=".py,.c,.cc,.cpp,.cxx,.java,.txt" />
+          </div>
+        </div>
+        <div class="editor-with-lines">
+          <pre id="codeLines" class="line-numbers" aria-hidden="true">1</pre>
+          <textarea id="codeInput" spellcheck="false" wrap="off"></textarea>
+        </div>
+      </article>
+
+      <article class="card panel side-stack">
+        <div class="execution-args-group">
+          <label for="executionArgsInput">执行参数（可选）</label>
+          <input id="executionArgsInput" type="text" placeholder="例如：--input data.txt --mode fast" />
+        </div>
+
+        <div>
+          <div class="panel-title panel-title-row">
+            <span>程序标准输入（stdin）</span>
+            <div>
+              <button id="uploadStdinButton" class="btn btn-ghost btn-sm" type="button">上传输入</button>
+              <input id="stdinFileInput" class="hidden-file-input" type="file"
+                accept=".txt,.in,.csv,.json,.xml,.yaml,.yml,.log,.md" />
             </div>
           </div>
-        </article>
-      </section>
-
-      <section class="card panel upload-panel">
-        <div class="panel-title">文件上传（用于程序处理文件）</div>
-        <input id="fileInput" type="file" />
-        <p class="tip">
-          上传后点击“运行代码”。系统会将文件打包并以运行时文件形式上传到执行环境。
-          程序可通过“执行参数”传入文件名（例如：<code>input.txt</code>）后自行读取。
-          若程序输出包含 <code>__OUTPUT_FILE_BEGIN__</code> 到 <code>__OUTPUT_FILE_END__</code> 标记，页面会自动下载输出文件。
-        </p>
-        <details class="tip-code-block">
-          <summary id="inputFileExampleSummary">如何编写代码才能输入文件（Python 示例）</summary>
-          <pre><code id="inputFileExampleCode"></code></pre>
-        </details>
-        <details class="tip-code-block">
-          <summary id="outputFileExampleSummary">如何编写代码才能输出文件（Python 示例）</summary>
-          <pre><code id="outputFileExampleCode"></code></pre>
-        </details>
-      </section>
-
-      <section class="card panel output-panel">
-        <div class="panel-title">输出信息</div>
-        <pre id="outputBox" aria-live="polite">等待执行...</pre>
-      </section>
-
-      <section class="card reserve-panel">
-        <h2>Debug 功能预留</h2>
-        <p>
-          已预留 <code>executor.debugCode()</code> 扩展点，后续可接入调试 API（断点、单步、变量观察）。
-        </p>
-      </section>
-
-      <footer class="site-footer">Desgned by Artificial Intelligence</footer>
-    </main>
-
-    <button id="helpFab" class="help-fab" type="button" aria-label="打开使用说明">?</button>
-
-    <div id="helpModal" class="help-modal" hidden>
-      <div class="help-modal-backdrop" data-help-close="backdrop"></div>
-      <section class="help-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
-        <header class="help-modal-header">
-          <h2 id="helpModalTitle">使用说明</h2>
-          <button id="helpModalClose" class="help-modal-close" type="button" aria-label="关闭">×</button>
-        </header>
-        <div class="help-modal-body">
-          <p id="helpModalStatus" class="help-modal-status">正在准备帮助文档，请稍候...</p>
-          <div id="helpMarkdownContent" class="help-modal-markdown" aria-label="Code Runner 使用说明"></div>
+          <div class="editor-with-lines stdin-editor-with-lines">
+            <pre id="stdinLines" class="line-numbers" aria-hidden="true">1</pre>
+            <textarea id="stdinInput" spellcheck="false" wrap="off" placeholder="可选：在此输入程序运行时需要的标准输入"></textarea>
+          </div>
         </div>
-      </section>
-    </div>
+      </article>
+    </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    <script type="module" src="./assets/app.js"></script>
-  </body>
+    <section class="card panel upload-panel">
+      <div class="panel-title">文件上传（用于程序处理文件）</div>
+      <input id="fileInput" type="file" />
+      <p class="tip">
+        上传后点击“运行代码”。系统会将文件打包并以运行时文件形式上传到执行环境。
+        程序可通过“执行参数”传入文件名（例如：<code>input.txt</code>）后自行读取。
+        若程序输出包含 <code>__OUTPUT_FILE_BEGIN__</code> 到 <code>__OUTPUT_FILE_END__</code> 标记，页面会自动下载输出文件。
+      </p>
+      <details class="tip-code-block">
+        <summary id="inputFileExampleSummary">如何编写代码才能输入文件（Python 示例）</summary>
+        <pre><code id="inputFileExampleCode"></code></pre>
+      </details>
+      <details class="tip-code-block">
+        <summary id="outputFileExampleSummary">如何编写代码才能输出文件（Python 示例）</summary>
+        <pre><code id="outputFileExampleCode"></code></pre>
+      </details>
+    </section>
+
+    <section class="card panel output-panel">
+      <div class="panel-title">输出信息</div>
+      <pre id="outputBox" aria-live="polite">等待执行...</pre>
+    </section>
+
+    <section class="card reserve-panel">
+      <h2>Debug 功能预留</h2>
+      <p>
+        已预留 <code>executor.debugCode()</code> 扩展点，后续可接入调试 API（断点、单步、变量观察）。
+      </p>
+    </section>
+
+    <footer class="site-footer">Designed by Artificial Intelligence</footer>
+  </main>
+
+  <button id="helpFab" class="help-fab" type="button" aria-label="打开使用说明">?</button>
+
+  <div id="helpModal" class="help-modal" hidden>
+    <div class="help-modal-backdrop" data-help-close="backdrop"></div>
+    <section class="help-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+      <header class="help-modal-header">
+        <h2 id="helpModalTitle">使用说明</h2>
+        <button id="helpModalClose" class="help-modal-close" type="button" aria-label="关闭">×</button>
+      </header>
+      <div class="help-modal-body">
+        <p id="helpModalStatus" class="help-modal-status">正在准备帮助文档，请稍候...</p>
+        <div id="helpMarkdownContent" class="help-modal-markdown" aria-label="Code Runner 使用说明"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script type="module" src="./assets/app.js"></script>
+</body>
+
 </html>
