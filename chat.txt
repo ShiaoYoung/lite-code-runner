@@ -1,0 +1,47 @@
+截至目前助手回复总结（按时间顺序）
+
+1) 首次“我们做了什么”总结回复
+- 说明了项目总目标：构建可部署到 GitHub Pages 的在线代码运行站点。
+- 汇总了已完成功能：多语言运行（Python/C/C++/Java/JavaScript/Matlab）、上传代码/stdin、执行参数、行号、Tab 插入、运行时文件上传、输出文件自动下载协议、安全提示、README 与 how-to-use 文档。
+- 说明关键修复：Judge0 UTF-8 400 改为 base64 提交，additional_files 失败时回退 stdin 注入，输出文件下载解析增强。
+- 标注当时进行中的任务：将 how-to-use.md 转 PDF + 右下角问号按钮弹窗展示。
+- 给出涉及文件清单（index.html / assets/app.js / assets/styles.css / assets/executor.js / assets/config.js / README.md / how-to-use.md 等）。
+
+2) 用户要求继续后
+- 回复会直接继续实现，不再停留在讨论。
+- 建立 todo，开始读取并分析 index.html / styles.css / app.js 的接入点。
+
+3) 实施第一版“PDF弹窗”
+- 在 index.html 新增右下角问号按钮、弹窗结构（遮罩、关闭按钮、iframe）。
+- 在 styles.css 新增浮动按钮和弹窗样式（含移动端适配）。
+- 在 app.js 新增逻辑：读取 how-to-use.md，转换为 PDF（jsPDF），在弹窗中显示，支持点击空白、叉号、Esc 关闭。
+
+4) 拉取后台探索结果并完成验证
+- 读取 explore/librarian 结果：确认项目中无现成 modal 逻辑；确认 jsPDF 多页文本方式可行，但中文字体有兼容注意点。
+- 完成校验：lsp_diagnostics（index/styles/app）无错误，node --check app.js 通过。
+- 向用户报告“已完成第一版 PDF 方案”。
+
+5) 用户反馈“PDF 组件加载失败”后的修复
+- 直接修复为多 CDN 回退加载 jsPDF（jsdelivr -> cdnjs -> unpkg）。
+- app.js 加入 ensureJsPdfLoaded 与动态 script 注入逻辑。
+- 再次验证：lsp_diagnostics 与 node --check 均通过。
+
+6) 用户反馈 CDN 超时并要求改策略（不要 PDF，直接展示 md 样式）
+- 接受新策略并执行：删除 PDF 相关方案，改为弹窗中直接渲染 how-to-use.md。
+- index.html：移除 PDF iframe，改成 markdown 容器；去掉 jsPDF 外链。
+- styles.css：新增 markdown 展示样式（标题、段落、列表、代码块、引用、分割线等）。
+- app.js：移除 jsPDF 和 Blob URL 逻辑，改为读取 md 并转为 HTML（含基础 markdown 语法支持与简单安全处理）。
+- 修复一次引号拼写导致的语法错误，并清理遗留 PDF revoke 代码。
+- 完成验证：lsp_diagnostics（index/styles/app）无错误，node --check app.js 通过。
+
+7) 用户要求改站点名与页脚版权
+- 将网站名改为 “Lite Code Runner”（title 与 h1）。
+- 页面底部新增版权文字：“Desgned by Artificial Intelligence”（按用户原拼写保留）。
+- styles.css 新增 .site-footer 样式。
+- 验证 index.html 与 styles.css 诊断通过。
+
+当前状态（最新）
+- 问号按钮 + 弹窗功能可用。
+- 弹窗展示的是 how-to-use.md 的样式化内容（非 PDF）。
+- 网站标题已改为 Lite Code Runner。
+- 页面底部已显示 “Desgned by Artificial Intelligence”。
