@@ -115,7 +115,7 @@ export async function fetchLanguages() {
   return response.json();
 }
 
-export async function runCode({ languageId, source, stdin, args, additionalFiles }) {
+export async function runCode({ languageId, source, stdin, args, additionalFiles, compileOptions = "" }) {
   const payload = {
     source_code: encodeUtf8Base64(source),
     language_id: languageId,
@@ -128,6 +128,10 @@ export async function runCode({ languageId, source, stdin, args, additionalFiles
 
   if (additionalFiles) {
     payload.additional_files = additionalFiles;
+  }
+
+  if (compileOptions) {
+    payload.compiler_options = compileOptions;
   }
 
   const query = "?base64_encoded=true&wait=true";

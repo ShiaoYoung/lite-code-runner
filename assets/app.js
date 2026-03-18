@@ -16,6 +16,8 @@ const ui = {
   uploadStdinButton: document.getElementById("uploadStdinButton"),
   stdinFileInput: document.getElementById("stdinFileInput"),
   executionArgsInput: document.getElementById("executionArgsInput"),
+  compileOptionsGroup: document.getElementById("compileOptionsGroup"),
+  compileOptionsInput: document.getElementById("compileOptionsInput"),
   stdinInput: document.getElementById("stdinInput"),
   stdinLines: document.getElementById("stdinLines"),
   fileInput: document.getElementById("fileInput"),
@@ -39,6 +41,8 @@ const state = {
   helpMarkdownHtml: "",
   helpMarkdownLoading: false
 };
+
+const COMPILER_OPTIONS_LANGUAGES = new Set(["c", "c++"]);
 
 const INPUT_FILE_EXAMPLES = {
   python: `import sys
@@ -378,6 +382,26 @@ function renderVersionSelect(language) {
   for (const item of options) {
     ui.versionSelect.appendChild(createOption(item.versionLabel, item.id));
   }
+}
+
+function supportsCompilerOptions(language) {
+  return COMPILER_OPTIONS_LANGUAGES.has(language);
+}
+
+function renderCompilerOptionsInput(language) {
+  const isSupported = supportsCompilerOptions(language);
+
+  if (ui.compileOptionsGroup instanceof HTMLElement) {
+    ui.compileOptionsGroup.hidden = !isSupported;
+  }
+
+  if (!(ui.compileOptionsInput instanceof HTMLInputElement)) {
+    return;
+  }
+
+  ui.compileOptionsInput.disabled = !isSupported;
+  ui.compileOptionsInput.placeholder =
+    language === "c" ? "例如：-O2 -Wall -std=c11" : "例如：-O2 -Wall -std=c++17";
 }
 
 function renderOutputFileExample(language) {
@@ -842,6 +866,10 @@ async function handleRun() {
   const languageId = Number.parseInt(ui.versionSelect.value, 10);
   const source = ui.codeInput.value;
   const args = ui.executionArgsInput.value.trim();
+  const compileOptions =
+    supportsCompilerOptions(state.selectedLanguage) && ui.compileOptionsInput instanceof HTMLInputElement
+      ? ui.compileOptionsInput.value.trim()
+      : "";
   const stdin = ui.stdinInput.value;
 
   if (!source.trim()) {
@@ -864,13 +892,13 @@ async function handleRun() {
 
     try {
       const additionalFiles = await buildAdditionalFilesBase64(runtimeFiles);
-      result = await runCode({ languageId, source, stdin, args, additionalFiles });
+      result = await runCode({ languageId, source, stdin, args, additionalFiles, compileOptions });
     } catch (error) {
       const status = Number(Reflect.get(error, "status"));
       if (runtimeFiles.length > 0 && status === 400) {
         const compatFiles = await buildStdinFilePayload(runtimeFiles);
         const compatStdin = mergeStdinWithFiles(stdin, compatFiles);
-        result = await runCode({ languageId, source, stdin: compatStdin, args, additionalFiles: "" });
+        result = await runCode({ languageId, source, stdin: compatStdin, args, additionalFiles: "", compileOptions });
         fallbackNotice = "\n\n提示：当前执行服务拒绝运行时文件直传，已自动回退为 stdin 注入协议。";
       } else {
         throw error;
@@ -970,6 +998,7 @@ async function initialize() {
   }
 
   renderVersionSelect(state.selectedLanguage);
+  renderCompilerOptionsInput(state.selectedLanguage);
 
   ui.languageSelect.addEventListener("change", (event) => {
     const target = event.target;
@@ -979,6 +1008,7 @@ async function initialize() {
 
     state.selectedLanguage = target.value;
     renderVersionSelect(state.selectedLanguage);
+    renderCompilerOptionsInput(state.selectedLanguage);
     setTemplateCode(state.selectedLanguage);
     renderInputFileExample(state.selectedLanguage);
     renderOutputFileExample(state.selectedLanguage);
